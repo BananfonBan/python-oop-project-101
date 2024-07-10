@@ -9,23 +9,22 @@ class Validator:
 
     def required(self):
         self.is_required = True
+        return self
 
 
     def string(self):
-        return String_Validator()
-    
+        return StringValidator()
 
 
-class String_Validator(Validator):
+    def number(self):
+        return NumberValidator()
+
+
+class StringValidator(Validator):
     def __init__(self):
         super().__init__()
         self.min_length = -float('inf')
         self.contain = ''
-
-
-    def required(self):
-        self.is_required = True
-        return self
 
 
     def contains(self, string):
@@ -49,3 +48,43 @@ class String_Validator(Validator):
             return True
         else:
             return False
+        
+
+class NumberValidator(Validator):
+    def __init__(self):
+        super().__init__()
+        self.is_positive_check = False
+        self.min_value = -float('inf')
+        self.max_value = float('inf')
+
+    
+    def positive(self):
+        self.is_required = True
+        self.is_positive_check = True
+        return self
+    
+
+    def range(self, min_value:int, max_value:int):
+        if min_value > max_value:
+            raise ValueError("The minimum value must be less than the maximum" )
+        else:
+            self.is_required = True
+            self.min_value = min_value
+            self.max_value = max_value
+            return self
+
+        
+    def is_valid(self, number):
+        if self.is_required == False:
+            return True
+        elif number == None or type(number) != int and self.is_required:
+            return False
+        elif self.min_value <= number <= self.max_value:
+            if self.is_positive_check:
+                return number > 0
+            else:
+                return True
+        else:
+            return False 
+
+
