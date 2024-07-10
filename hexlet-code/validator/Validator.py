@@ -18,6 +18,10 @@ class Validator:
 
     def number(self):
         return NumberValidator()
+    
+    
+    def list(self):
+        return ListValidator()
 
 
 class StringValidator(Validator):
@@ -40,7 +44,7 @@ class StringValidator(Validator):
 
 
     def is_valid(self, string):
-        if self.is_required == False:
+        if not self.is_required:
             return True
         elif string == None or string == '' and self.is_required:
             return False
@@ -75,7 +79,7 @@ class NumberValidator(Validator):
 
         
     def is_valid(self, number):
-        if self.is_required == False:
+        if not self.is_required:
             return True
         elif number == None or type(number) != int and self.is_required:
             return False
@@ -88,3 +92,27 @@ class NumberValidator(Validator):
             return False 
 
 
+class ListValidator(Validator):
+    def __init__(self):
+        super().__init__()
+        self.sizeof_list = None
+
+
+    def sizeof(self, value:int):
+        if type(value) != int:
+            raise ValueError("Size of list must be integer value")
+        self.sizeof_list = value
+        self.is_required = True
+        return self
+    
+
+    def is_valid(self, obj):
+        if not self.is_required:
+            return True
+        elif type(obj) == list:
+            if self.sizeof_list == None:
+                return True
+            else:
+                return len(obj) == self.sizeof_list
+        else:
+            return False
