@@ -18,10 +18,14 @@ class Validator:
 
     def number(self):
         return NumberValidator()
-    
-    
+
+
     def list(self):
         return ListValidator()
+
+
+    def dict(self):
+        return DictValidator()
 
 
 class StringValidator(Validator):
@@ -100,7 +104,7 @@ class ListValidator(Validator):
 
     def sizeof(self, value:int):
         if type(value) != int:
-            raise ValueError("Size of list must be integer value")
+            raise TypeError("Size of list must be integer value")
         self.sizeof_list = value
         self.is_required = True
         return self
@@ -116,3 +120,30 @@ class ListValidator(Validator):
                 return len(obj) == self.sizeof_list
         else:
             return False
+        
+
+class DictValidator(Validator):
+    def __init__(self):
+        super().__init__()
+        self.dict_shape = {}
+
+
+    def shape(self, dict_shape:dict):
+        self.dict_shape = dict_shape
+        return self
+
+
+    def is_valid(self, obj:dict):
+        if type(obj) != dict:
+            raise TypeError("Value must be dictionary")
+        if obj.keys() != self.dict_shape.keys():
+            raise ValueError("Keys of shape dict and dict must be the same")
+        for key, value in obj.items():
+            if not self.dict_shape[key].is_valid(value):
+                return False
+        return True
+        
+
+
+
+

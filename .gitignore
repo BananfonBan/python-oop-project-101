@@ -1,1 +1,4 @@
 __pycache__/
+draft.py
+/hexlet-code/validator/__pycache__/*.pyc
+Validator.cpython-312.pyc

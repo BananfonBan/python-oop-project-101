@@ -1,4 +1,4 @@
-from Validator import Validator
+from validator.Validator import Validator
 
 vlist1 = Validator().list().required()
 vlist2 = Validator().list()
