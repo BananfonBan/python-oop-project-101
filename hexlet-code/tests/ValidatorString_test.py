@@ -1,4 +1,4 @@
-from Validator import Validator
+from validator.Validator import Validator
 
 v_str = Validator().string()
 
