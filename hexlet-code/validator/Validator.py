@@ -37,20 +37,18 @@ class StringValidator(Validator):
 
     def contains(self, string):
         self.contain = string
-        self.is_required = True
         return self
 
 
     def min_len(self, length:int=-float('inf')):
         self.min_length = length
-        self.is_required = True
         return self
 
 
     def is_valid(self, string):
-        if not self.is_required:
+        if not self.is_required and (string == None or string == ""):
             return True
-        elif string == None or string == '' and self.is_required:
+        elif self.is_required and (string == None or string == ""):
             return False
         elif self.contain in string and len(string) >= self.min_length:
             return True
@@ -67,7 +65,6 @@ class NumberValidator(Validator):
 
     
     def positive(self):
-        self.is_required = True
         self.is_positive_check = True
         return self
     
@@ -76,16 +73,15 @@ class NumberValidator(Validator):
         if min_value > max_value:
             raise ValueError("The minimum value must be less than the maximum" )
         else:
-            self.is_required = True
             self.min_value = min_value
             self.max_value = max_value
             return self
 
         
     def is_valid(self, number):
-        if not self.is_required:
+        if not self.is_required and type(number) != int:
             return True
-        elif number == None or type(number) != int and self.is_required:
+        elif type(number) != int and self.is_required:
             return False
         elif self.min_value <= number <= self.max_value:
             if self.is_positive_check:
@@ -106,18 +102,17 @@ class ListValidator(Validator):
         if type(value) != int:
             raise TypeError("Size of list must be integer value")
         self.sizeof_list = value
-        self.is_required = True
         return self
     
 
     def is_valid(self, obj):
-        if not self.is_required:
+        if not self.is_required and type(obj) != list:
             return True
         elif type(obj) == list:
-            if self.sizeof_list == None:
-                return True
-            else:
+            if self.sizeof_list:
                 return len(obj) == self.sizeof_list
+            else:
+                return True
         else:
             return False
         
