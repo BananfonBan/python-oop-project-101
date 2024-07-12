@@ -41,7 +41,8 @@ def add_validator_test():
     schema = v.string().test("start with", "H")
     assert schema.is_valid("Hexlet") == True
     assert schema.is_valid("Exlet") == False
-    print(schema.is_valid("Hex"))
+    assert schema.contains("let").min_len(5).is_valid("Hexlet let") == True
+    assert schema.contains("let").min_len(5).is_valid("HexHex") == False
 
 
 required_string_test()

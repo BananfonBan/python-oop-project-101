@@ -1,6 +1,7 @@
 class ValidatorBase:
     def __init__(self):
         self.is_required = False
+        self.checks = {}
 
 
     def is_valid(self, obj):
@@ -11,8 +12,9 @@ class ValidatorBase:
         pass
 
 
-    def test(self, name_validator, value):
-        pass
+    def test(self, name_validator, *value):
+        self.checks.update({name_validator: {"func": self.validators[name_validator], "args": list(*value)}})
+        return self
 
 
 
@@ -30,8 +32,8 @@ class Validator:
         return StringValidator(validators=self.user_validators["string"])
 
 
-    # def number(self):
-    #     return NumberValidator()
+    def number(self):
+        return NumberValidator(validators=self.user_validators["number"])
 
 
     # def list(self):
@@ -59,7 +61,6 @@ class StringValidator(ValidatorBase):
             "min len": self._min_length,
         }
         self.validators.update(validators)
-        self.checks = {}
 
 
     @staticmethod
@@ -93,11 +94,6 @@ class StringValidator(ValidatorBase):
         return self
 
 
-    def test(self, name_validator, value):
-        self.checks.update({name_validator: {"func": self.validators[name_validator], "args": list(value)}})
-        return self
-
-
     def is_valid(self, string):
         if not self.is_required and (string == None or string == ''):
             return True
@@ -109,40 +105,53 @@ class StringValidator(ValidatorBase):
 
 
 class NumberValidator(ValidatorBase):
-    def __init__(self):
+    def __init__(self, validators):
         super().__init__()
-        self.type_validator = "number"
-        self.is_positive_check = False
-        self.min_value = -float('inf')
-        self.max_value = float('inf')
+        self.validators = {
+            "required": self._required,
+            "positive": self._positive,
+            "range": self._range,
+        }
+        self.validators.update(validators)
 
+
+    @staticmethod
+    def _required(num):
+        return type(num) == int
+    
+
+    @staticmethod
+    def _positive(num):
+        return num > 0
+
+    
+    @staticmethod
+    def _range(num, min, max):
+        return min <= num <= max
+
+
+    def required(self):
+        self.is_required = True
+        self.checks.update({"required":{"func":self._required, "args": []}})
+        return self
 
     def positive(self):
-        self.is_positive_check = True
+        self.checks.update({"positive": {"func": self._positive, "args": []}})
         return self
 
 
     def range(self, min_value:int, max_value:int):
-        if min_value > max_value:
-            raise ValueError("The minimum value must be less than the maximum" )
-        else:
-            self.min_value = min_value
-            self.max_value = max_value
-            return self
+        self.checks.update({"range": {"func": self._range, "args": [min_value, max_value]}})
+        return self
 
 
     def is_valid(self, number):
         if not self.is_required and type(number) != int:
             return True
-        elif type(number) != int and self.is_required:
-            return False
-        elif self.min_value <= number <= self.max_value:
-            if self.is_positive_check:
-                return number > 0
-            else:
-                return True
-        else:
-            return False 
+        for key, value in self.checks.items():
+            if self.validators[key](number, *value["args"]) == False:
+                return False
+        return True
 
 
 class ListValidator(ValidatorBase):
