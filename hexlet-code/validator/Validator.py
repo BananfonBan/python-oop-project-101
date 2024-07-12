@@ -8,76 +8,119 @@ class ValidatorBase:
 
 
     def required(self):
-        self.is_required = True
-        return self
+        pass
 
 
-
-class Validator(ValidatorBase):
-    def __init__(self):
-        super().__init__()
-
-    def string(self):
-        return StringValidator()
-
-
-    def number(self):
-        return NumberValidator()
-
-
-    def list(self):
-        return ListValidator()
-
-
-    def dict(self):
-        return DictValidator()
-
-
-    def add_validator(type_validator:str, name_validator:str, fn):
+    def test(self, name_validator, value):
         pass
 
 
 
-class StringValidator(ValidatorBase):
+class Validator:
     def __init__(self):
+        self.user_validators = {
+            "string": {},
+            "number": {},
+            "list": {},
+            "dict": {},
+        }
+
+
+    def string(self):
+        return StringValidator(validators=self.user_validators["string"])
+
+
+    # def number(self):
+    #     return NumberValidator()
+
+
+    # def list(self):
+    #     return ListValidator()
+
+
+    # def dict(self):
+    #     return DictValidator()
+
+
+    def add_validator(self, type_validator:str, name_validator:str, fn):
+        if not type_validator in self.user_validators:
+            raise ValueError("Valid values of type validators:\nstring\nnumber\nlist\ndict")
+        new_fn = {name_validator: fn}
+        self.user_validators[type_validator].update(new_fn)
+
+
+
+class StringValidator(ValidatorBase):
+    def __init__(self, validators):
         super().__init__()
-        self.min_length = -float('inf')
-        self.contain = ''
+        self.validators = {
+            "required": self._required,
+            "contains": self._contains,
+            "min len": self._min_length,
+        }
+        self.validators.update(validators)
+        self.checks = {}
+
+
+    @staticmethod
+    def _required(string):
+        return string != None and string != ""
+
+
+    @staticmethod
+    def _contains(string, сontained_string):
+        return сontained_string in string
+
+
+    @staticmethod
+    def _min_length(string, min):
+        return len(string) >= min
+
+
+    def required(self):
+        self.is_required = True
+        self.checks.update({"required":{"func":self._required, "args": []}})
+        return self
 
 
     def contains(self, string):
-        self.contain = string
+        self.checks.update({"contains": {"func":self._contains, "args": [string]}})
         return self
 
 
     def min_len(self, length:int=-float('inf')):
-        self.min_length = length
+        self.checks.update({"min len": {"func":self._min_length, "args": [length]}})
+        return self
+
+
+    def test(self, name_validator, value):
+        self.checks.update({name_validator: {"func": self.validators[name_validator], "args": list(value)}})
         return self
 
 
     def is_valid(self, string):
-        if not self.is_required and (string == None or string == ""):
+        if not self.is_required and (string == None or string == ''):
             return True
-        elif self.is_required and (string == None or string == ""):
-            return False
-        elif self.contain in string and len(string) >= self.min_length:
-            return True
-        else:
-            return False
-        
+        for key, value in self.checks.items():
+            if self.validators[key](string, *value["args"]) == False:
+                return False
+        return True
+
+
 
 class NumberValidator(ValidatorBase):
     def __init__(self):
         super().__init__()
+        self.type_validator = "number"
         self.is_positive_check = False
         self.min_value = -float('inf')
         self.max_value = float('inf')
 
-    
+
     def positive(self):
         self.is_positive_check = True
         return self
-    
+
 
     def range(self, min_value:int, max_value:int):
         if min_value > max_value:
@@ -87,7 +130,7 @@ class NumberValidator(ValidatorBase):
             self.max_value = max_value
             return self
 
-        
+
     def is_valid(self, number):
         if not self.is_required and type(number) != int:
             return True
@@ -105,6 +148,7 @@ class NumberValidator(ValidatorBase):
 class ListValidator(ValidatorBase):
     def __init__(self):
         super().__init__()
+        self.type_validator = "list"
         self.sizeof_list = None
 
 
@@ -113,7 +157,7 @@ class ListValidator(ValidatorBase):
             raise TypeError("Size of list must be integer value")
         self.sizeof_list = value
         return self
-    
+
 
     def is_valid(self, obj):
         if not self.is_required and type(obj) != list:
@@ -125,11 +169,12 @@ class ListValidator(ValidatorBase):
                 return True
         else:
             return False
-        
+
 
 class DictValidator(ValidatorBase):
     def __init__(self):
         super().__init__()
+        self.type_validator = "dict"
         self.dict_shape = {}
 
 
