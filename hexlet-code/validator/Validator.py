@@ -1,4 +1,4 @@
-class Validator:
+class ValidatorBase:
     def __init__(self):
         self.is_required = False
 
@@ -11,6 +11,11 @@ class Validator:
         self.is_required = True
         return self
 
+
+
+class Validator(ValidatorBase):
+    def __init__(self):
+        super().__init__()
 
     def string(self):
         return StringValidator()
@@ -28,7 +33,12 @@ class Validator:
         return DictValidator()
 
 
-class StringValidator(Validator):
+    def add_validator(type_validator:str, name_validator:str, fn):
+        pass
+
+
+
+class StringValidator(ValidatorBase):
     def __init__(self):
         super().__init__()
         self.min_length = -float('inf')
@@ -56,7 +66,7 @@ class StringValidator(Validator):
             return False
         
 
-class NumberValidator(Validator):
+class NumberValidator(ValidatorBase):
     def __init__(self):
         super().__init__()
         self.is_positive_check = False
@@ -92,7 +102,7 @@ class NumberValidator(Validator):
             return False 
 
 
-class ListValidator(Validator):
+class ListValidator(ValidatorBase):
     def __init__(self):
         super().__init__()
         self.sizeof_list = None
@@ -117,7 +127,7 @@ class ListValidator(Validator):
             return False
         
 
-class DictValidator(Validator):
+class DictValidator(ValidatorBase):
     def __init__(self):
         super().__init__()
         self.dict_shape = {}
@@ -137,8 +147,4 @@ class DictValidator(Validator):
             if not self.dict_shape[key].is_valid(value):
                 return False
         return True
-        
-
-
-
 
