@@ -45,8 +45,8 @@ class Validator:
         return ListValidator(validators=self.user_validators["list"])
 
 
-    # def dict(self):
-    #     return DictValidator()
+    def dict(self):
+        return DictValidator(validators=self.user_validators["dict"])
 
 
     def add_validator(self, type_validator:str, name_validator:str, fn):
@@ -174,24 +174,28 @@ class ListValidator(ValidatorBase):
 
 
 class DictValidator(ValidatorBase):
-    def __init__(self):
+    def __init__(self, validators):
         super().__init__()
-        self.type_validator = "dict"
-        self.dict_shape = {}
+        self.validators = {
+            "requierd": self._required,
+            "shape": self._shape
+        }
+        self.validators.update(validators)
 
 
-    def shape(self, dict_shape:dict):
-        self.dict_shape = dict_shape
-        return self
-
-
-    def is_valid(self, obj:dict):
-        if type(obj) != dict:
-            raise TypeError("Value must be dictionary")
-        if obj.keys() != self.dict_shape.keys():
-            raise ValueError("Keys of shape dict and dict must be the same")
-        for key, value in obj.items():
-            if not self.dict_shape[key].is_valid(value):
+    @staticmethod
+    def _shape(_dict, dict_shape):
+        for key, value in _dict.items():
+            if not dict_shape[key].is_valid(value):
                 return False
         return True
 
+
+    @staticmethod
+    def _required(_dict):
+        return type(_dict) == dict
+
+
+    def shape(self, dict_shape:dict):
+        self.checks.update({"shape": {"func": self._shape, "args": [dict_shape]}})
+        return self
