@@ -4,10 +4,6 @@ class ValidatorBase:
         self.checks = {}
 
 
-    def is_valid(self, obj):
-        pass
-
-
     def required(self):
         pass
 
@@ -15,6 +11,15 @@ class ValidatorBase:
     def test(self, name_validator, *value):
         self.checks.update({name_validator: {"func": self.validators[name_validator], "args": list(value)}})
         return self
+
+
+    def is_valid(self, obj):
+        if not self.is_required and not self._required(obj):
+            return True
+        for key, value in self.checks.items():
+            if self.validators[key](obj, *value["args"]) == False:
+                return False
+        return True
 
 
 
@@ -92,16 +97,7 @@ class StringValidator(ValidatorBase):
     def min_len(self, length:int=-float('inf')):
         self.checks.update({"min len": {"func":self._min_length, "args": [length]}})
         return self
-
-
-    def is_valid(self, string):
-        if not self.is_required and (string == None or string == ''):
-            return True
-        for key, value in self.checks.items():
-            if self.validators[key](string, *value["args"]) == False:
-                return False
-        return True
-
+    
 
 
 class NumberValidator(ValidatorBase):
@@ -145,14 +141,6 @@ class NumberValidator(ValidatorBase):
         return self
 
 
-    def is_valid(self, number):
-        if not self.is_required and type(number) != int:
-            return True
-        for key, value in self.checks.items():
-            if self.validators[key](number, *value["args"]) == False:
-                return False
-        return True
-
 
 class ListValidator(ValidatorBase):
     def __init__(self, validators):
@@ -183,15 +171,6 @@ class ListValidator(ValidatorBase):
     def sizeof(self, value:int):
         self.checks.update({"sizeof": {"func":self._sizeof, "args": [value]}})
         return self
-
-
-    def is_valid(self, obj):
-        if not self.is_required and type(obj) != list:
-            return True
-        for key, value in self.checks.items():
-            if self.validators[key](obj, *value["args"]) == False:
-                return False
-        return True
 
 
 class DictValidator(ValidatorBase):
