@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "hexlet-code"
+version = "0.1.0"
+description = ""
+authors = ["BananfonBan <bananfonban@yandex.ru>"]
+readme = "README.md"
+packages = [
+  { include = "validator" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
