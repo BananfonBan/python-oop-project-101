@@ -1,16 +1,23 @@
 from validator.Validator import Validator
 
-v_num1 = Validator().number().required()
+v_num1 = Validator().number()
 v_num2 = Validator().number()
 
 def requred_test():
+    v_num1 = Validator().number()
+    v_num2 = Validator().number()
+    assert v_num1.positive().is_valid(None) == True
+    assert v_num1.required().is_valid(None) == False
     assert v_num1.is_valid(None) == False
-    assert v_num1.is_valid(0) == True
+    assert v_num1.is_valid(1) == True
     assert v_num2.is_valid(None) == True
     assert v_num2.is_valid(0) == True
 
 
+
 def range_test():
+    v_num1 = Validator().number().required()
+    v_num2 = Validator().number()
     assert v_num1.range(-5, 5).is_valid(0) == True
     assert v_num1.is_valid(-5) == True
     assert v_num1.is_valid(10) == False
@@ -23,6 +30,8 @@ def range_test():
 
 
 def positive_test():
+    v_num1 = Validator().number().required()
+    v_num2 = Validator().number()
     assert v_num1.positive().is_valid(-5) == False
     assert v_num1.is_valid(4) == True
     assert v_num1.is_valid(None) == False

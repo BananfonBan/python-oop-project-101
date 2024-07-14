@@ -1,4 +1,4 @@
-from .validator.Validator import Validator
+from validator.Validator import Validator
 
 
 def test_1():

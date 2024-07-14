@@ -16,6 +16,8 @@ class ValidatorBase:
     def is_valid(self, obj):
         if not self.is_required and not self._required(obj):
             return True
+        elif self.is_required and not self._required(obj):
+            return False
         for key, value in self.checks.items():
             if self.validators[key](obj, *value["args"]) == False:
                 return False
