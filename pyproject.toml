@@ -1,12 +1,11 @@
 [tool.poetry]
 name = "hexlet-code"
+packages = [{include = "validator"}]
 version = "0.1.0"
 description = ""
 authors = ["BananfonBan <bananfonban@yandex.ru>"]
 readme = "README.md"
-packages = [
-  { include = "validator" },
-]
+
 
 [tool.poetry.dependencies]
 python = "^3.12"
