@@ -3,15 +3,12 @@ class ValidatorBase:
         self.is_required = False
         self.checks = {}
 
-
     def required(self):
         pass
 
-
     def test(self, name_validator, *value):
-        self.checks.update({name_validator: {"func": self.validators[name_validator], "args": list(value)}})
+        self._update(name_validator, self.validators[name_validator], *value)
         return self
-
 
     def is_valid(self, obj):
         if not self.is_required and not self._required(obj):
@@ -19,10 +16,12 @@ class ValidatorBase:
         elif self.is_required and not self._required(obj):
             return False
         for key, value in self.checks.items():
-            if self.validators[key](obj, *value["args"]) == False:
+            if not self.validators[key](obj, *value["args"]):
                 return False
         return True
 
+    def _update(self, name_fn, fn, *args):
+        self.checks.update({name_fn: {"func": fn, "args": list(args)}})
 
 
 class Validator:
@@ -34,29 +33,21 @@ class Validator:
             "dict": {},
         }
 
-
     def string(self):
         return StringValidator(validators=self.user_validators["string"])
-
 
     def number(self):
         return NumberValidator(validators=self.user_validators["number"])
 
-
     def list(self):
         return ListValidator(validators=self.user_validators["list"])
-
 
     def dict(self):
         return DictValidator(validators=self.user_validators["dict"])
 
-
-    def add_validator(self, type_validator:str, name_validator:str, fn):
-        if not type_validator in self.user_validators:
-            raise ValueError("Valid values of type validators:\nstring\nnumber\nlist\ndict")
+    def add_validator(self, type_validator: str, name_validator: str, fn):
         new_fn = {name_validator: fn}
         self.user_validators[type_validator].update(new_fn)
-
 
 
 class StringValidator(ValidatorBase):
@@ -69,37 +60,33 @@ class StringValidator(ValidatorBase):
         }
         self.validators.update(validators)
 
-
     @staticmethod
     def _required(string):
-        return string != None and string != ""
-
+        if string is not None and string != "":
+            return True
+        else:
+            return False
 
     @staticmethod
     def _contains(string, сontained_string):
         return сontained_string in string
 
-
     @staticmethod
     def _min_length(string, min):
         return len(string) >= min
 
-
     def required(self):
         self.is_required = True
-        self.checks.update({"required":{"func":self._required, "args": []}})
+        self._update("required", self._required)
         return self
-
 
     def contains(self, string):
-        self.checks.update({"contains": {"func":self._contains, "args": [string]}})
+        self._update("contains", self._contains, string)
         return self
 
-
-    def min_len(self, length:int=-float('inf')):
-        self.checks.update({"min len": {"func":self._min_length, "args": [length]}})
+    def min_len(self, length: int = -float('inf')):
+        self._update("min len", self._min_length, length)
         return self
-    
 
 
 class NumberValidator(ValidatorBase):
@@ -112,36 +99,30 @@ class NumberValidator(ValidatorBase):
         }
         self.validators.update(validators)
 
-
     @staticmethod
     def _required(num):
-        return type(num) == int
-    
+        return type(num) is int
 
     @staticmethod
     def _positive(num):
         return num > 0
 
-    
     @staticmethod
     def _range(num, min, max):
         return min <= num <= max
 
-
     def required(self):
         self.is_required = True
-        self.checks.update({"required":{"func":self._required, "args": []}})
+        self._update("required", self._required)
         return self
 
     def positive(self):
-        self.checks.update({"positive": {"func": self._positive, "args": []}})
+        self._update("positive", self._positive)
         return self
 
-
-    def range(self, min_value:int, max_value:int):
-        self.checks.update({"range": {"func": self._range, "args": [min_value, max_value]}})
+    def range(self, min_value: int, max_value: int):
+        self._update("range", self._range, min_value, max_value,)
         return self
-
 
 
 class ListValidator(ValidatorBase):
@@ -153,25 +134,21 @@ class ListValidator(ValidatorBase):
         }
         self.validators.update(validators)
 
-
     @staticmethod
     def _required(list_):
-        return type(list_) == list
-
+        return type(list_) is list
 
     @staticmethod
     def _sizeof(list_, value):
         return len(list_) == value
 
-
     def required(self):
         self.is_required = True
-        self.checks.update({"required": {"func": self._required, "args": []}})
+        self._update("required", self._required)
         return self
 
-
-    def sizeof(self, value:int):
-        self.checks.update({"sizeof": {"func":self._sizeof, "args": [value]}})
+    def sizeof(self, value: int):
+        self._update("sizeof", self._sizeof, value)
         return self
 
 
@@ -184,7 +161,6 @@ class DictValidator(ValidatorBase):
         }
         self.validators.update(validators)
 
-
     @staticmethod
     def _shape(_dict, dict_shape):
         for key, value in _dict.items():
@@ -192,12 +168,10 @@ class DictValidator(ValidatorBase):
                 return False
         return True
 
-
     @staticmethod
     def _required(_dict):
-        return type(_dict) == dict
+        return type(_dict) is dict
 
-
-    def shape(self, dict_shape:dict):
-        self.checks.update({"shape": {"func": self._shape, "args": [dict_shape]}})
+    def shape(self, dict_shape: dict):
+        self._update("shape", self._shape, dict_shape)
         return self
