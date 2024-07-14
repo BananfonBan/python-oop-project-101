@@ -1,2 +1,2 @@
-from Validator import Validator
+from .Validator import Validator
 __all__ = ('Validator',)
