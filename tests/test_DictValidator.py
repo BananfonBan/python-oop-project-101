@@ -14,7 +14,7 @@ def test_dictvalidator(schema):
     schema.shape({
         'name': v.string().required(),
         'age': v.number().positive(),
-        })
+    })
     assert schema.is_valid({'name': 'kolya', 'age': 100})
     assert schema.is_valid({'name': 'maya', 'age': None})
     assert not schema.is_valid({'name': '', 'age': None})
@@ -27,7 +27,7 @@ def test_dictvalidator_2(schema):
         "Greet": v.string().min_len(6).contains('Hello'),
         "Friends": v.list().sizeof(2),
         "Age": v.number().positive().range(14, 120)
-        })
+    })
 
     assert schema.is_valid({
         "Greet": "Hello Bob!",
@@ -62,7 +62,7 @@ def test_dictvalidator_3(schema):
         "Greet": v.string().required().min_len(6).contains('Hello'),
         "Friends": v.list().required().sizeof(2),
         "Age": v.number().required().positive().range(14, 120)
-        })
+    })
     assert schema.is_valid({
         "Greet": "Hello Bob!",
         "Friends": ["Dima", "Lesha"],
