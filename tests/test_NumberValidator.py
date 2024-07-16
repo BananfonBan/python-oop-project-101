@@ -4,7 +4,7 @@ v_num1 = Validator().number()
 v_num2 = Validator().number()
 
 
-def requred_test():
+def test_requred():
     v_num1 = Validator().number()
     v_num2 = Validator().number()
     assert v_num1.positive().is_valid(None)
@@ -15,7 +15,7 @@ def requred_test():
     assert v_num2.is_valid(0)
 
 
-def range_test():
+def test_range():
     v_num1 = Validator().number().required()
     v_num2 = Validator().number()
     assert v_num1.range(-5, 5).is_valid(0)
@@ -28,7 +28,7 @@ def range_test():
     assert v_num1.range(0, 10).range(-10, 5).is_valid(-4)
 
 
-def positive_test():
+def test_positive():
     v_num1 = Validator().number().required()
     v_num2 = Validator().number()
     assert not v_num1.positive().is_valid(-5)
@@ -38,7 +38,7 @@ def positive_test():
     assert v_num2.positive().is_valid(None)
 
 
-def add_validator_test():
+def test_add_validator():
     v = Validator()
 
     def non_positive(num):
@@ -50,9 +50,3 @@ def add_validator_test():
     assert not schema.is_valid(5)
     assert not schema.range(-10, -5).is_valid(-4)
     assert schema.range(-10, -5).is_valid(-7)
-
-
-requred_test()
-range_test()
-positive_test()
-add_validator_test()

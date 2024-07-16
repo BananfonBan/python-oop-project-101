@@ -1,39 +1,34 @@
+import pytest
 from validator.Validator import Validator
 
-v = Validator()
 
-schema = v.dict()
-
-schema.shape({
-    'name': v.string().required(),
-    'age': v.number().positive(),
-})
-
-schema2 = v.dict()
-
-schema2.shape({
-    "Greet": v.string().min_len(6).contains('Hello'),
-    "Friends": v.list().sizeof(2),
-    "Age": v.number().positive().range(14, 120)
-})
-
-schema3 = v.dict()
-
-schema3.shape({
-    "Greet": v.string().required().min_len(6).contains('Hello'),
-    "Friends": v.list().required().sizeof(2),
-    "Age": v.number().required().positive().range(14, 120)
-})
+@pytest.fixture
+def schema():
+    v = Validator()
+    schema = v.dict()
+    return schema
 
 
-def dictvalidator_test(schema):
+def test_dictvalidator(schema):
+    v = Validator()
+    schema.shape({
+        'name': v.string().required(),
+        'age': v.number().positive(),
+        })
     assert schema.is_valid({'name': 'kolya', 'age': 100})
     assert schema.is_valid({'name': 'maya', 'age': None})
     assert not schema.is_valid({'name': '', 'age': None})
     assert not schema.is_valid({'name': 'ada', 'age': -5})
 
 
-def dictvalidator_test2(schema):
+def test_dictvalidator_2(schema):
+    v = Validator()
+    schema.shape({
+        "Greet": v.string().min_len(6).contains('Hello'),
+        "Friends": v.list().sizeof(2),
+        "Age": v.number().positive().range(14, 120)
+        })
+
     assert schema.is_valid({
         "Greet": "Hello Bob!",
         "Friends": ["Dima", "Lesha"],
@@ -61,7 +56,13 @@ def dictvalidator_test2(schema):
     assert schema.is_valid({"Greet": None, "Friends": None, "Age": None})
 
 
-def dictvalidator_test3(schema):
+def test_dictvalidator_3(schema):
+    v = Validator()
+    schema.shape({
+        "Greet": v.string().required().min_len(6).contains('Hello'),
+        "Friends": v.list().required().sizeof(2),
+        "Age": v.number().required().positive().range(14, 120)
+        })
     assert schema.is_valid({
         "Greet": "Hello Bob!",
         "Friends": ["Dima", "Lesha"],
@@ -90,8 +91,3 @@ def dictvalidator_test3(schema):
         "Greet": None,
         "Friends": None,
         "Age": None})
-
-
-dictvalidator_test(schema)
-dictvalidator_test2(schema2)
-dictvalidator_test3(schema3)

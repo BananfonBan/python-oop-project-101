@@ -4,7 +4,7 @@ v_list1 = Validator().list().required()
 v_list2 = Validator().list()
 
 
-def required_test():
+def test_required():
     assert v_list1.is_valid([])
     assert not v_list1.is_valid(None)
     assert v_list1.is_valid(['Test'])
@@ -13,13 +13,13 @@ def required_test():
     assert v_list2.is_valid(["Test"])
 
 
-def sizeof_test():
+def test_sizeof():
     assert v_list1.sizeof(4).is_valid([1, 2, 3, 4])
     assert v_list1.sizeof(55).sizeof(2).is_valid(["Hexlet", "tests"])
     assert v_list2.sizeof(0).is_valid(None)
 
 
-def add_validator_test():
+def test_add_validator():
     def in_list(list_, values_1, values_2):
         return values_1 in list_ and values_2 in list_
 
@@ -31,8 +31,3 @@ def add_validator_test():
     schema2 = v.list().test("in list", 42, 69).sizeof(5)
     assert schema2.is_valid([2, 34, 42, 77, 69])
     assert not schema2.is_valid([2, 34, 42, 77, 59])
-
-
-required_test()
-sizeof_test()
-add_validator_test()

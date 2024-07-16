@@ -62,7 +62,3 @@ def test_2():
     assert not schema.is_valid({
         "new validator": {"42": "!42!", "69": 69, "72": 72},
         "common validator": "It string but!"})
-
-
-test_1()
-test_2()

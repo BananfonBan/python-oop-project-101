@@ -1,7 +1,7 @@
 from validator.Validator import Validator
 
 
-def required_string_test():
+def test_required_string():
     v_str = Validator().string()
     v_str2 = Validator().string()
     assert v_str != v_str2
@@ -16,7 +16,7 @@ def required_string_test():
     assert v_str2.is_valid("")
 
 
-def min_len_test():
+def test_min_len():
     v_str = Validator().string().required()
     v_str2 = Validator().string()
     assert v_str.min_len(4).is_valid("Hello!")
@@ -27,7 +27,7 @@ def min_len_test():
     assert not v_str2.min_len(10).is_valid("not")
 
 
-def contains_test():
+def test_contains():
     v_str = Validator().string().required()
     v_str2 = Validator().string()
     assert v_str.contains("World").is_valid("Hello World!")
@@ -36,7 +36,7 @@ def contains_test():
     assert v_str2.min_len(5).is_valid("")
 
 
-def add_validator_test():
+def test_add_validator():
     def start_with(string, letter):
         return string[0] == letter
     v = Validator()
@@ -46,12 +46,3 @@ def add_validator_test():
     assert not schema.is_valid("Exlet")
     assert schema.contains("let").min_len(5).is_valid("Hexlet let")
     assert not schema.contains("let").min_len(5).is_valid("HexHex")
-
-
-required_string_test()
-min_len_test()
-contains_test()
-add_validator_test()
-
-
-__all__ = ('Validator',)
